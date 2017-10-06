@@ -26,7 +26,7 @@ class Rule(object):
         comment (str, optional): Additional comments
 
     Returns:
-        rule: victa.Rule
+        victa.Rule:
 
     """
     def __init__(self, value, attribute, operator, name, comment=''):
@@ -66,9 +66,10 @@ class RuleSet(dict):
     def test(self, expr, record):
         """
         Test a ruleset expression against a record
+
         Args:
-            expr:
-            record:
+            expr (str): string expression to be evaluated
+            record (pandas.Series): record to test against expression
 
         Returns:
             Bool:
@@ -87,10 +88,10 @@ class RuleSet(dict):
         convert each integer node to a callable function
 
         Args:
-            expr:
+            expr (str): string expression to be evaluated
 
         Returns:
-            code object:
+            code (object):
         """
         transformer = RuleSetTransformer()
         expr = str(expr).strip() #str(expr) to handle pandas parsing '321' as int

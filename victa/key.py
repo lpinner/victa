@@ -3,16 +3,8 @@
 
 Classification Key
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-Integer metus urna, vehicula id faucibus viverra, posuere vitae lectus.
-Pellentesque laoreet ex sed interdum finibus.
-
-Example:
-    Vestibulum facilisis, nunc quis ultricies facilisis, eros dolor gravida ligula, nec iaculis enim ligula quis nibh.
-
 TODO:
     - Module level doc
-    - Examples!
 """
 
 __all__ = ['Key', 'ClassificationError']
@@ -68,7 +60,6 @@ class Key(object):
                 see victa.rules.build_rules
 
         Returns:
-            #tuple(Couplet, list): the output class and a list of couplets that were "followed"
             tuple(pandas.Series, pandas.Dataframe): the output class and a the couplets that were "followed"
 
         Raises:
@@ -76,7 +67,7 @@ class Key(object):
 
         TODO:
             - figure out a better way to stop infinite recursion
-            - decide return data model: pandas DataFrame, Series, dict, tuple (current), etc...?
+            - decide return data model
             - need a better word than "followed" in the docstring
         """
         # TODO need a better word than "followed" in the docstring
@@ -93,7 +84,7 @@ class Key(object):
                 if self.ruleset.test(rules['ruleset'], record):
                     visited += [couplet]
                     if couplet.type == 'class':
-                        # TODO decide return data model
+                        # TODO decide return data model: tuple(pandas.Series, pandas.Dataframe), tuple(Couplet, list), etc...?
                         #return couplet, visited
                         visited = pd.DataFrame(visited)
                         return couplet.to_series(), visited.assign(step=visited.index)
@@ -109,14 +100,10 @@ class Key(object):
                 see victa.key.build_rules
 
         Yields:
-            tuple(Couplet, list): the output class and a list of couplets that were "followed"
-        Raises:
-            ClassificationError: When unable to classify a record
-
-        TODO:
-            - doesn't handle ClassificationError
-            - need a better word than "followed" in the docstring
-
+            tuple(pandas.Series, pandas.Dataframe, pandas.Series): the output class, a list of couplets
+                that were "followed" and the input record
+        Notes:
+            Will yield tuple(None, None, pandas.Series) on ClassificationError
         """
         # TODO need a better word than "followed" in the docstring
 
@@ -130,7 +117,7 @@ class Key(object):
             yield result, steps, record
 
 
-        #     def draw_key(self, root=0):
+#     def draw_key(self, root=0):
 #         """ Generate a plot of the Key """
 #         #TODO - decide plotting software and implement it properly, graphviz is a pain to install and uggghhhly
 # 
