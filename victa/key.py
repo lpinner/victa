@@ -50,7 +50,7 @@ class Key(object):
         self.ruleset = build_rules(rules_df)
         self.key = build_key(key_df, key_desc)
 
-    def classify(self, record):
+    def classify(self, record, id_field=None):
         """
         Classify a record
 
@@ -86,13 +86,21 @@ class Key(object):
                     if couplet.type == 'class':
                         # TODO decide return data model: tuple(pandas.Series, pandas.Dataframe), tuple(Couplet, list), etc...?
                         #return couplet, visited
-                        visited = pd.DataFrame(visited)
-                        return couplet.to_series(), visited.assign(step=visited.index)
+                        result = couplet.to_series()  # Series
+                        steps = pd.DataFrame(visited) # Dataframe
+                        steps = steps.assign(step=steps.index)
+
+                        if id_field:
+                            result.loc[id_field] = record[id_field]
+                            steps = steps.assign(**{id_field: record[id_field]})
+
+                        return result, steps
+
                     break
 
         raise ClassificationError('Unable to classify record', record)
 
-    def classify_iter(self, records):
+    def classify_iter(self, records, id_field=None):
         """
         Args:
             records (pandas.DataFrame): records to be classified
@@ -110,7 +118,7 @@ class Key(object):
         for idx, record in records.iterrows():
             result, steps = None, None
             try:
-                result, steps = self.classify(record)
+                result, steps = self.classify(record, id_field)
             except ClassificationError:
                 pass
 
