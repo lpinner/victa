@@ -29,14 +29,12 @@ from .couplets import Couplet
 
 
 class ClassificationError(Exception):
-    """ Custom Exception raised when classification fails"""
+    """ Custom Exception raised when classification fails """
     pass
 
 
 class Key(object):
-    """ Classification Key
-
-    """
+    """ Classification Key """
 
     def __init__(self, key_df, key_desc, rules_df):
         """
@@ -56,8 +54,8 @@ class Key(object):
 
         Args:
             record (pandas.Series): record to be classified
-                record needs to contain all columns (Series axis labels) referred to in the `Rule`s
-                see victa.rules.build_rules
+                record needs to contain all columns (Series axis labels) referred to in the :code:`Rule`.
+                See victa.rules.build_rules
             id_field (str): Name of attribute field to uniquely identify each record.
 
         Returns:
@@ -103,7 +101,7 @@ class Key(object):
         """
         Args:
             records (pandas.DataFrame): records to be classified
-                records need to contain all columns (DataFrame axis labels) referred to in the `Rule`s
+                records need to contain all columns (DataFrame axis labels) referred to in the :code:`Rule`s
                 see victa.key.build_rules
 
         Yields:
@@ -147,13 +145,13 @@ def build_key(key_df, key_desc):
              - INPUT_COUPLET = unique integer identifying the parent couplet.
              - RULES = string containing expression to test.
 
-                Expression format must be valid python syntax and conform to the following grammar:
+                Expression format must be valid python syntax and conform to the following grammar::
 
-                    `[not] rule_id [[and|or][not][rule_id]]`
+                    [not] rule_id [[and|or][not][rule_id]]
 
-                `rule_id` is an integer identifying each rule to be tested.
+                :code:`rule_id` is an integer identifying each rule to be tested.
 
-                Examples:
+                Examples::
 
                     NNN
                     not NNN

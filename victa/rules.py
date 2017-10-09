@@ -21,7 +21,7 @@ class Rule(object):
     Args:
         value (str): text string to look for
         attribute (str): attribute/column to use when rule is tested
-        operator (str): positive comparison operator (currently only `in` and `equal`)
+        operator (str): positive comparison operator (currently only :code:`in` and :code:`equal`)
         name (str): Rule name
         comment (str, optional): Additional comments
 
@@ -81,8 +81,8 @@ class RuleSet(dict):
         """
         Magic happens here :)
 
-        What this does is turn a string expression like `not (123 or 456)` into a compiled code object ready for
-        evaluation, such as `not (ruleset[123](record) or ruleset[456](record))`
+        What this does is turn a string expression like :code:`not (123 or 456)` into a compiled code object ready for
+        evaluation, such as :code:`not (ruleset[123](record) or ruleset[456](record))`
 
         We do this by assuming each integer is a rule ID and altering the expression using an ast.NodeTransformer to
         convert each integer node to a callable function
@@ -138,7 +138,7 @@ def build_rules(rules_df):
             The dataframe must have the following column structure:
              - ID = unique integer identifying the rule
              - ATTRIBUTE = attribute/column to use when rule is tested (i.e. in the record to be classified by the key)
-             - OPERATOR = positive comparison operator (currently only `in` and `equal`)
+             - OPERATOR = positive comparison operator (currently only :code:`in` and :code:`equal`)
              - VALUE = text string to look for in ATTRIBUTE
              - NAME = Rule name
              - COMMENTS [optional] = Additional comments
