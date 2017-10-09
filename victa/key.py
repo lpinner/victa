@@ -12,7 +12,7 @@ __all__ = ['Key', 'ClassificationError']
 import pandas as pd
 import networkx as nx
 
-## TODO - decide plotting software and implement it properly, graphviz is a pain to install and uggghhhly
+# TODO - decide plotting software and implement it properly, graphviz is a pain to install and uggghhhly
 # import matplotlib.pyplot as plt
 # import pygraphviz.agraph
 # try:
@@ -58,9 +58,10 @@ class Key(object):
             record (pandas.Series): record to be classified
                 record needs to contain all columns (Series axis labels) referred to in the `Rule`s
                 see victa.rules.build_rules
+            id_field (str): Name of attribute field to uniquely identify each record.
 
         Returns:
-            tuple(pandas.Series, pandas.Dataframe): the output class and a the couplets that were "followed"
+            tuple(pandas.Series, pandas.Dataframe): the output class and a the couplets that were traversed
 
         Raises:
             ClassificationError: When unable to classify a record
@@ -68,13 +69,11 @@ class Key(object):
         TODO:
             - figure out a better way to stop infinite recursion
             - decide return data model
-            - need a better word than "followed" in the docstring
         """
-        # TODO need a better word than "followed" in the docstring
 
         visited = [self.key.root]
 
-        ## TODO figure out a better way to stop infinite recursion
+        # TODO figure out a better way to stop infinite recursion
         #while True:
         for i in range(len(self.key.node)*2):
 
@@ -85,7 +84,7 @@ class Key(object):
                     visited += [couplet]
                     if couplet.type == 'class':
                         # TODO decide return data model: tuple(pandas.Series, pandas.Dataframe), tuple(Couplet, list), etc...?
-                        #return couplet, visited
+                        # return couplet, visited
                         result = couplet.to_series()  # Series
                         steps = pd.DataFrame(visited) # Dataframe
                         steps = steps.assign(step=steps.index)
@@ -109,11 +108,10 @@ class Key(object):
 
         Yields:
             tuple(pandas.Series, pandas.Dataframe, pandas.Series): the output class, a list of couplets
-                that were "followed" and the input record
+                that were traversed and the input record
         Notes:
             Will yield tuple(None, None, pandas.Series) on ClassificationError
         """
-        # TODO need a better word than "followed" in the docstring
 
         for idx, record in records.iterrows():
             result, steps = None, None
