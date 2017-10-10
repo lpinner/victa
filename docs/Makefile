@@ -10,5 +10,5 @@ BUILDDIR      = ../../build
 PROJDIR     = ../victa
 
 %: Makefile
-	@$(SPHINXAPIDOC) -f -o apidoc  "$(PROJDIR)"
+	@$(SPHINXAPIDOC) -f -o "$(BUILDDIR)"  "$(PROJDIR)"
 	@$(SPHINXBUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)"
