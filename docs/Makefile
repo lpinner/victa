@@ -6,9 +6,9 @@ SPHINXBUILD   = sphinx-build
 SPHINXAPIDOC   = sphinx-apidoc
 SPHINXPROJ    = VICTA
 SOURCEDIR     = .
-BUILDDIR      = ../../build
+BUILDDIR      = ../../apidoc
 PROJDIR     = ../victa
 
 %: Makefile
-	@$(SPHINXAPIDOC) -f -o "$(BUILDDIR)"  "$(PROJDIR)"
+	@$(SPHINXAPIDOC) -f -o "$(SOURCEDIR)"  "$(PROJDIR)"
 	@$(SPHINXBUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)"
