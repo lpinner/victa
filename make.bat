@@ -10,7 +10,7 @@ if "%DISTDIR%" == "" (
 )
 
 python setup.py sdist --dist-dir="%DISTDIR%"
-python setup.py bdist_wheel --dist-dir="%DISTDIR%" --bdist-dir="%BUILDDIR%"
+python setup.py bdist_wheel --dist-dir="%DISTDIR%" --bdist-dir="%BUILDDIR%"  --universal
 rmdir /q /s build 
 rmdir /q /s VICTA.egg-info 
 
