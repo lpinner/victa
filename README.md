@@ -63,7 +63,7 @@ The rules dataframe must have the following column structure:
 |    OPERATOR      |    Positive comparison   operator (currently only :code:`in` and :code:`equal`)                      |
 |    VALUE         |    Text string to look   for in ATTRIBUTE                                                            |
 |    NAME          |    Rule name                                                                                         |
-|    COMMENTS      | Additional comments [optional]                                                                       |
+|    COMMENTS      |    Additional comments [optional]                                                                    |
 
 ## Code Example
 
