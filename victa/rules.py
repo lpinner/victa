@@ -1,16 +1,12 @@
 """
 TODO Docstring
 """
-__all__ = ['Rule', 'RuleSet', 'RuleSyntaxError']
+__all__ = ['Rule', 'RuleSet']
 
 import ast
 import pandas as pd
 
-
-class RuleSyntaxError(SyntaxError):
-    """ Custom Exception raised when rule parsing fails"""
-    pass
-
+from .errors import RuleSyntaxError
 
 class Rule(object):
     """

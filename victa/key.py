@@ -7,10 +7,11 @@ TODO:
     - Module level doc
 """
 
-__all__ = ['Key', 'ClassificationError']
+__all__ = ['Key']
 
 import pandas as pd
 import networkx as nx
+
 
 # TODO - decide plotting software and implement it properly, graphviz is a pain to install and uggghhhly
 # import matplotlib.pyplot as plt
@@ -26,11 +27,7 @@ import networkx as nx
 
 from .rules import build_rules
 from .couplets import Couplet
-
-
-class ClassificationError(Exception):
-    """ Custom Exception raised when classification fails """
-    pass
+from .errors import ClassificationError, MultipleMatchesError
 
 
 class Key(object):
@@ -75,27 +72,39 @@ class Key(object):
         #while True:
         for i in range(len(self.key.node)*2):
 
+            matches = []
             for in_couplet, out_couplet, rules in self.key.edges_iter(visited[-1].id, data=True):
 
                 couplet = self.key.node[out_couplet]['couplet']
                 if self.ruleset.test(rules['ruleset'], record):
-                    visited += [couplet]
-                    if couplet.type == 'class':
-                        # TODO decide return data model: tuple(pandas.Series, pandas.Dataframe), tuple(Couplet, list), etc...?
-                        # return couplet, visited
-                        result = couplet.to_series()  # Series
-                        steps = pd.DataFrame(visited) # Dataframe
-                        steps = steps.assign(step=steps.index)
+                    matches.append((couplet, rules['ruleset']))
 
-                        if id_field:
-                            result.loc[id_field] = record[id_field]
-                            steps = steps.assign(**{id_field: record[id_field]})
+            if len(matches) == 1:
+                couplet, _ = matches[0]
+                visited += [couplet]
 
-                        return result, steps
+                if couplet.type == 'class':
+                    # TODO decide return data model: tuple(pandas.Series, pandas.Dataframe), tuple(Couplet, list), etc...?
+                    # return couplet, visited
+                    result = couplet.to_series()  # Series
+                    steps = pd.DataFrame(visited) # Dataframe
+                    steps = steps.assign(step=steps.index)
 
-                    break
+                    if id_field:
+                        result.loc[id_field] = record[id_field]
+                        steps = steps.assign(**{id_field: record[id_field]})
 
-        raise ClassificationError('Unable to classify record', record)
+                    return result, steps
+
+                else:
+                    continue
+
+            elif len(matches) > 1:
+                rulesets = (cr[1] for cr in matches)
+                raise MultipleMatchesError(record, id_field, visited[-1], rulesets)
+
+            else:
+                raise ClassificationError(record, id_field, visited)
 
     def classify_iter(self, records, id_field=None):
         """
@@ -108,14 +117,14 @@ class Key(object):
             tuple(pandas.Series, pandas.Dataframe, pandas.Series): the output class, a list of couplets
                 that were traversed and the input record
         Notes:
-            Will yield tuple(None, None, pandas.Series) on ClassificationError
+            Will yield tuple(None, None, pandas.Series) on ClassificationError, MultipleMatchesError
         """
 
         for idx, record in records.iterrows():
             result, steps = None, None
             try:
                 result, steps = self.classify(record, id_field)
-            except ClassificationError:
+            except (ClassificationError, MultipleMatchesError):
                 pass
 
             yield result, steps, record
@@ -185,7 +194,7 @@ def build_key(key_df, key_desc):
             couplet = Couplet(int(row['OUTPUT_COUPLET']), 'couplet', row['OUTPUT_NAME'], row['COMMENTS'])
 
         key.add_node(couplet.id, couplet=couplet)
-        key.add_edge(in_couplet, couplet.id, ruleset=row['RULES'])
+        key.add_edge(in_couplet, couplet.id, ruleset=str(row['RULES']).strip())
 
     return key
 
