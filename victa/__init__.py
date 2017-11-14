@@ -9,7 +9,16 @@ TODO:
 
 """
 
-__all__ = ['Key', 'ClassificationError', 'Rule', 'RuleSet', 'RuleSyntaxError', 'Couplet', 'build_rules', 'build_key']
+__all__ = ['build_rules',
+           'build_key',
+           'ClassificationError',
+           'MultipleMatchesError',
+           'Couplet',
+           'Key',
+           'Rule',
+           'RuleSet',
+           'RuleSyntaxError',
+           ]
 
 from .key import Key, ClassificationError, build_key
 from .rules import Rule, RuleSet, build_rules
