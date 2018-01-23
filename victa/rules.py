@@ -7,6 +7,7 @@ import ast
 import pandas as pd
 
 from .errors import RuleSyntaxError
+from .utils import isclose
 
 class Rule(object):
     """
@@ -38,7 +39,10 @@ class Rule(object):
         self.comment = str(comment).strip()
 
     def _equal(self, value):
-        return value == self.value
+        try:
+            return isclose(float(value), float(self.value))
+        except ValueError:
+            return value == self.value
 
     def _in(self, value):
         return self.value in value

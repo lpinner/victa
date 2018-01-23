@@ -68,8 +68,18 @@ def shutil_which(cmd, mode=os.F_OK | os.X_OK, path=None):
                     return name
     return None
 
+def _isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
+    #https://www.python.org/dev/peps/pep-0485
+    return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
+
 try:
     from shutil import which
 except ImportError:
     which = shutil_which
 #Monkey patch for pygraphviz.agraph.AGraph._which
+
+#Backport py 3.5+ isclose
+try:
+    from cmath import isclose
+except ImportError:
+    isclose = _isclose

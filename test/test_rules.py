@@ -66,4 +66,16 @@ def test_rule2():
         assert rules.test(expr, testdata)
 
 
+def test_rule3():
+    """Test floating point comparisons"""
+    expr = '1'
+
+    Data = namedtuple('Data', ['attribute'])
+    testdata = Data(attribute=5.0)
+    rule1 = Rule('5', 'attribute', 'equal', 'test rule1')
+
+    rules = RuleSet({1: rule1})
+    assert rules.test(expr, testdata)
+
+
 
