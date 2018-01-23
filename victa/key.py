@@ -187,11 +187,14 @@ def build_key(key_df, key_desc):
     key.add_node(key.root.id, couplet=key.root)
 
     for idx, row in key_df.iterrows():
-        in_couplet = int(row['INPUT_COUPLET'])
+        #in_couplet = int(row['INPUT_COUPLET'])
+        in_couplet = row['INPUT_COUPLET']
         if pd.isnull(row['OUTPUT_COUPLET']):  # leaf node
-            couplet = Couplet(int(row['OUTPUT_CLASS']), 'class', row['OUTPUT_NAME'], row['COMMENTS'])
+            #couplet = Couplet(int(row['OUTPUT_CLASS']), 'class', row['OUTPUT_NAME'], row['COMMENTS'])
+            couplet = Couplet(row['OUTPUT_CLASS'], 'class', row['OUTPUT_NAME'], row['COMMENTS'])
         else:
-            couplet = Couplet(int(row['OUTPUT_COUPLET']), 'couplet', row['OUTPUT_NAME'], row['COMMENTS'])
+            #couplet = Couplet(int(row['OUTPUT_COUPLET']), 'couplet', row['OUTPUT_NAME'], row['COMMENTS'])
+            couplet = Couplet(row['OUTPUT_COUPLET'], 'couplet', row['OUTPUT_NAME'], row['COMMENTS'])
 
         key.add_node(couplet.id, couplet=couplet)
         key.add_edge(in_couplet, couplet.id, ruleset=str(row['RULES']).strip())
