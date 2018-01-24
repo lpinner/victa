@@ -6,7 +6,7 @@ __all__ = ['Rule', 'RuleSet']
 import ast
 import pandas as pd
 
-from .errors import RuleSyntaxError
+from .errors import RuleSyntaxError, ManadatoryFieldError
 from .utils import isclose
 
 class Rule(object):
@@ -160,6 +160,11 @@ def build_rules(rules_df):
     """
     ruleset = RuleSet()
     for idx, row in rules_df.iterrows():
+        # Ensure mandatory fields are not empty
+        test = row.drop(['COMMENTS'])
+        if test.isnull().any():
+            raise ManadatoryFieldError('All of "ID", "ATTRIBUTE", "OPERATOR", "VALUE", "NAME" must contain a value')
+
         rule_id = int(row['ID'])
         comment = '' if pd.isnull(row['COMMENTS']) else row['COMMENTS']
 

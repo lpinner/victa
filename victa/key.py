@@ -27,7 +27,7 @@ import networkx as nx
 
 from .rules import build_rules
 from .couplets import Couplet
-from .errors import ClassificationError, MultipleMatchesError
+from .errors import ClassificationError, MultipleMatchesError, ManadatoryFieldError
 
 
 class Key(object):
@@ -198,7 +198,13 @@ def build_key(key_df, key_desc):
     key.add_node(key.root.id, couplet=key.root)
 
     for idx, row in key_df.iterrows():
-        #in_couplet = int(row['INPUT_COUPLET'])
+        if pd.isnull(row['INPUT_COUPLET']):
+            raise ManadatoryFieldError('"INPUT_COUPLET" must contain a value')
+        if pd.isnull(row['OUTPUT_CLASS']) and pd.isnull(row['OUTPUT_COUPLET']) :
+            raise ManadatoryFieldError('Either "OUTPUT_COUPLET" or "OUTPUT_CLASS" must contain a value')
+        if pd.isnull(row['RULES']):
+            raise ManadatoryFieldError('"RULES" must contain a value')
+
         try:
             in_couplet = int(row['INPUT_COUPLET'])
         except ValueError:

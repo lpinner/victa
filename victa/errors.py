@@ -31,3 +31,8 @@ class RuleSyntaxError(VictaError, SyntaxError):
     """ Custom Exception raised when rule parsing fails"""
     pass
 
+
+class ManadatoryFieldError(VictaError, ValueError):
+    """ Custom Exception raised when Key/Rule building fails because of empty fields"""
+    pass
+
