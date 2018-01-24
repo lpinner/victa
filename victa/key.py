@@ -42,6 +42,11 @@ class Key(object):
              key_desc (str): see victa.key.build_key
              rules_df (pandas.DataFrame): see victa.key.build_rules
          """
+        # Make all column headers upper case, as sqlalchemy columns are returned lower, cx_oracle are upper and csv/excel
+        # could be any case
+        rules_df.columns = rules_df.columns.str.upper()
+        key_df.columns = key_df.columns.str.upper()
+
         self.ruleset = build_rules(rules_df)
         self.key = build_key(key_df, key_desc)
 
@@ -67,6 +72,12 @@ class Key(object):
         """
 
         visited = [self.key.root]
+
+        # Make all column headers upper case, as sqlalchemy columns are returned lower, cx_oracle are upper and csv/excel
+        # could be any case
+        record.rename(lambda i: i.upper(), inplace=True) #record will be a pandas Series
+        if id_field:
+            id_field = id_field.upper()
 
         # TODO figure out a better way to stop infinite recursion
         #while True:
@@ -188,13 +199,22 @@ def build_key(key_df, key_desc):
 
     for idx, row in key_df.iterrows():
         #in_couplet = int(row['INPUT_COUPLET'])
-        in_couplet = row['INPUT_COUPLET']
+        try:
+            in_couplet = int(row['INPUT_COUPLET'])
+        except ValueError:
+            in_couplet = row['INPUT_COUPLET']
+
         if pd.isnull(row['OUTPUT_COUPLET']):  # leaf node
-            #couplet = Couplet(int(row['OUTPUT_CLASS']), 'class', row['OUTPUT_NAME'], row['COMMENTS'])
-            couplet = Couplet(row['OUTPUT_CLASS'], 'class', row['OUTPUT_NAME'], row['COMMENTS'])
+            out_couplet = 'OUTPUT_CLASS'
+            out_type = 'class'
         else:
-            #couplet = Couplet(int(row['OUTPUT_COUPLET']), 'couplet', row['OUTPUT_NAME'], row['COMMENTS'])
-            couplet = Couplet(row['OUTPUT_COUPLET'], 'couplet', row['OUTPUT_NAME'], row['COMMENTS'])
+            out_couplet = 'OUTPUT_COUPLET'
+            out_type = 'class'
+
+        try:
+            couplet = Couplet(int(row[out_couplet]), out_type, row['OUTPUT_NAME'], row['COMMENTS'])
+        except ValueError:
+            couplet = Couplet(row[out_couplet], out_type, row['OUTPUT_NAME'], row['COMMENTS'])
 
         key.add_node(couplet.id, couplet=couplet)
         key.add_edge(in_couplet, couplet.id, ruleset=str(row['RULES']).strip())

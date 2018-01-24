@@ -1,4 +1,5 @@
 import os
+import pandas.io.parsers
 
 #Monkey patch for pygraphviz.agraph.AGraph._which
 def _which(self, name):
@@ -72,14 +73,18 @@ def _isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
     #https://www.python.org/dev/peps/pep-0485
     return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
 
+# Monkey patch for pygraphviz.agraph.AGraph._which
 try:
     from shutil import which
 except ImportError:
     which = shutil_which
-#Monkey patch for pygraphviz.agraph.AGraph._which
 
-#Backport py 3.5+ isclose
+# Backport py 3.5+ isclose
 try:
     from cmath import isclose
 except ImportError:
     isclose = _isclose
+
+# Monkey patch for read_* to not interpret 'N/A' & 'NA' as NaN
+# This is an ugly hack and really *should* be implemented by library users by passing by passing na_values=[], keep_default_na=False to their pandas.read_* calls
+pandas.io.parsers._NA_VALUES = {'-1.#QNAN', '-nan', '', '-NaN', '#NA', 'N/A', 'NaN', '#N/A', '1.#QNAN', '1.#IND', 'nan', 'NULL', '-1.#IND', '#N/A N/A'}

@@ -44,6 +44,18 @@ class Rule(object):
         except ValueError:
             return value == self.value
 
+    def _greater_than(self, value):
+        try:
+            return float(value) > float(self.value)
+        except ValueError:
+            return value == self.value
+
+    def _less_than(self, value):
+        try:
+            return float(value) < float(self.value)
+        except ValueError: #TODO warn about non-numeric?
+            return False
+
     def _in(self, value):
         return self.value in value
 
@@ -57,7 +69,7 @@ class Rule(object):
             Bool:
         """
 
-        value = str(getattr(record, self.attribute)).upper()
+        value = str(getattr(record, self.attribute)).strip().upper()
         return getattr(self, '_' + self.operator)(value)
 
 
