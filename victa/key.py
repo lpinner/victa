@@ -215,7 +215,7 @@ def build_key(key_df, key_desc):
             out_type = 'class'
         else:
             out_couplet = 'OUTPUT_COUPLET'
-            out_type = 'class'
+            out_type = 'couplet'
 
         try:
             couplet = Couplet(int(row[out_couplet]), out_type, row['OUTPUT_NAME'], row['COMMENTS'])
