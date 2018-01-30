@@ -84,7 +84,7 @@ class Key(object):
         for i in range(len(self.key.node)*2):
 
             matches = []
-            for in_couplet, out_couplet, rules in self.key.edges_iter(visited[-1].id, data=True):
+            for in_couplet, out_couplet, rules in self.key.edges(visited[-1].id, data=True):
 
                 couplet = self.key.node[out_couplet]['couplet']
                 if self.ruleset.test(rules['ruleset'], record):
