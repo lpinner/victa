@@ -200,10 +200,12 @@ def build_key(key_df, key_desc):
     for idx, row in key_df.iterrows():
         if pd.isnull(row['INPUT_COUPLET']):
             raise ManadatoryFieldError('"INPUT_COUPLET" must contain a value')
-        if pd.isnull(row['OUTPUT_CLASS']) and pd.isnull(row['OUTPUT_COUPLET']) :
-            raise ManadatoryFieldError('Either "OUTPUT_COUPLET" or "OUTPUT_CLASS" must contain a value')
         if pd.isnull(row['RULES']):
             raise ManadatoryFieldError('"RULES" must contain a value')
+        if pd.isnull(row['OUTPUT_CLASS']) and pd.isnull(row['OUTPUT_COUPLET']) :
+            raise ManadatoryFieldError('Either "OUTPUT_COUPLET" or "OUTPUT_CLASS" must contain a value')
+        if pd.isnull(row['OUTPUT_NAME']):
+            raise ManadatoryFieldError('"OUTPUT_NAME" must contain a value')
 
         try:
             in_couplet = int(row['INPUT_COUPLET'])
