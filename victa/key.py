@@ -150,8 +150,6 @@ class Key(object):
 #         plt.show()
 
 
-
-
 def build_key(key_df, key_desc):
     """
 
@@ -206,6 +204,9 @@ def build_key(key_df, key_desc):
             raise ManadatoryFieldError('Either "OUTPUT_COUPLET" or "OUTPUT_CLASS" must contain a value')
         if pd.isnull(row['OUTPUT_NAME']):
             raise ManadatoryFieldError('"OUTPUT_NAME" must contain a value')
+
+        if pd.isnull(row['COMMENTS']):
+            row['COMMENTS'] = ''
 
         try:
             in_couplet = int(row['INPUT_COUPLET'])
