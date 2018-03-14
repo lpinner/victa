@@ -194,13 +194,18 @@ def build_rules(rules_df):
             The dataframe must have the following column structure:
              - ID = unique integer identifying the rule
              - ATTRIBUTE = attribute/column to use when rule is tested (i.e. in the record to be classified by the key)
-             - OPERATOR = positive comparison operator (currently only :code:`in` and :code:`equal`)
-             - VALUE = text string to look for in ATTRIBUTE
+             - OPERATOR =  positive comparison operator:
+                :code:`in`, :code:`=`, :code:`>=`, :code:`>`, :code:`<=`, :code:`<`, :code:`regex`
+                where: regex is a valid [regular expression](https://docs.python.org/3/library/re.html)
+             - VALUE = text string to look for in ATTRIBUTE.
              - NAME = Rule name
              - COMMENTS [optional] = Additional comments
 
     Returns:
         ruleset: victa.RuleSet
+
+    Note:
+        -  Order for ordinal comparisons is ATTRIBUTE operator VALUE, i.e ATTRIBUTE >= 5.0
     """
     ruleset = RuleSet()
     for idx, row in rules_df.iterrows():
