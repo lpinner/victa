@@ -85,6 +85,6 @@ try:
 except ImportError:
     isclose = _isclose
 
-# Monkey patch for read_* to not interpret 'N/A' & 'NA' as NaN
+# Monkey patch for read_* to not interpret 'NULL', 'N/A' & 'NA' as NaN
 # This is an ugly hack and really *should* be implemented by library users by passing by passing na_values=[], keep_default_na=False to their pandas.read_* calls
-pandas.io.parsers._NA_VALUES = {'-1.#QNAN', '-nan', '', '-NaN', '#NA', 'N/A', 'NaN', '#N/A', '1.#QNAN', '1.#IND', 'nan', 'NULL', '-1.#IND', '#N/A N/A'}
+pandas.io.parsers._NA_VALUES = {'-1.#QNAN', '-nan', '', '-NaN', '#NA', 'N/A', 'NaN', '#N/A', '1.#QNAN', '1.#IND', 'nan', '-1.#IND', '#N/A N/A'}
