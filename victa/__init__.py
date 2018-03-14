@@ -8,6 +8,7 @@ TODO:
     - Package level doc
 
 """
+__version__ = '2.4'
 
 __all__ = ['build_rules',
            'build_key',
