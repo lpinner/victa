@@ -5,6 +5,8 @@ __all__ = ['Rule', 'RuleSet']
 
 import ast
 import pandas as pd
+import re
+import sre_constants
 
 from .errors import RuleSyntaxError, ManadatoryFieldError
 from .utils import isclose
@@ -18,7 +20,8 @@ class Rule(object):
     Args:
         value (str): text string to look for
         attribute (str): attribute/column to use when rule is tested
-        operator (str): positive comparison operator (currently only :code:`in` and :code:`equal`)
+        operator (str): positive comparison operator: :code:`in`, :code:`=`, :code:`>=`, :code:`>`, :code:`<=`, :code:`<`, :code:`regex`
+            where: regex is a valid regular expression string (https://docs.python.org/3/library/re.html)
         name (str): Rule name
         comment (str, optional): Additional comments
 
@@ -32,9 +35,35 @@ class Rule(object):
         Returns:
             object:
         """
-        self.value = str(value).strip().upper() ## TODO think about/handle case. What about regexes?
+        self.operators = {   # Operator synonyms
+            '=': self._equal,
+            '==': self._equal,
+            'equals': self._equal,
+            'equal': self._equal, # Required for backwards compatibility
+            'in': self._in,
+            '>=': self._ge,
+            'ge': self._ge,
+            '>': self._gt,
+            'gt': self._gt,
+            '<=': self._le,
+            'le': self._le,
+            '<': self._lt,
+            'lt': self._lt,
+            're': self._re,
+            'regex': self._re,
+        }
+
         self.attribute = str(attribute).strip()
-        self.operator = str(operator).strip()
+        self.operator = self.operators[str(operator).strip().lower()]
+
+        if self.operator == self._re:
+            try:
+                self.value = re.compile(str(value).strip(), re.IGNORECASE)
+            except sre_constants.error as e:
+                raise RuleSyntaxError('Invalid regex syntax "{}": {}'.format(e.pattern, ','.join(e.args)))
+        else:
+            self.value = str(value).strip().upper() ## TODO think about/handle case. What about regexes?
+
         self.name = str(name).strip()
         self.comment = str(comment).strip()
 
@@ -44,20 +73,35 @@ class Rule(object):
         except ValueError:
             return value == self.value
 
-    def _greater_than(self, value):
+    def _in(self, value):
+        return self.value in value
+
+    def _re(self, value):
+        return True if self.value.search(value) else False
+
+    def _ge(self, value):
+        try:
+            return float(value) >= float(self.value)
+        except ValueError:
+            return value >= self.value
+
+    def _gt(self, value):
         try:
             return float(value) > float(self.value)
         except ValueError:
-            return value == self.value
+            return value > self.value
 
-    def _less_than(self, value):
+    def _le(self, value):
+        try:
+            return float(value) <= float(self.value)
+        except ValueError:
+            return value <= self.value
+
+    def _lt(self, value):
         try:
             return float(value) < float(self.value)
-        except ValueError: #TODO warn about non-numeric?
-            return False
-
-    def _in(self, value):
-        return self.value in value
+        except ValueError:
+            return value < self.value
 
     def __call__(self, record):
         """
@@ -70,7 +114,7 @@ class Rule(object):
         """
 
         value = str(getattr(record, self.attribute)).strip().upper()
-        return getattr(self, '_' + self.operator)(value)
+        return self.operator(value)
 
 
 class RuleSet(dict):
@@ -161,9 +205,12 @@ def build_rules(rules_df):
     ruleset = RuleSet()
     for idx, row in rules_df.iterrows():
         # Ensure mandatory fields are not empty
-        test = row.drop(['COMMENTS'])
+        mandatory = ['ID', 'ATTRIBUTE', 'OPERATOR', 'VALUE', 'NAME']
+        test = row.loc[mandatory]
         if test.isnull().any():
-            raise ManadatoryFieldError('All of "ID", "ATTRIBUTE", "OPERATOR", "VALUE", "NAME" must contain a value')
+            fields = ', '.join(['"{}"'.format(m) for m in mandatory])
+            values =  test.to_dict()
+            raise ManadatoryFieldError('All of {} must contain a value: {}'.format(fields, values))
 
         rule_id = int(row['ID'])
         comment = '' if pd.isnull(row['COMMENTS']) else row['COMMENTS']
