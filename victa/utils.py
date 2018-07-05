@@ -1,13 +1,19 @@
 import os
+import sys
+
 import pandas.io.parsers
 
-#Monkey patch for pygraphviz.agraph.AGraph._which
+
+# Monkey patch for pygraphviz.agraph.AGraph._which
+# noinspection PyUnusedLocal
 def _which(self, name):
     return which(name)
+
 
 # Code from shutil.which - python 3.3+
 # https://github.com/python/cpython/blob/master/Lib/shutil.py#L1096
 # PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2
+# noinspection PyShadowingBuiltins
 def shutil_which(cmd, mode=os.F_OK | os.X_OK, path=None):
     """Given a command, mode, and a PATH string, return the path which
     conforms to the given mode on the PATH, or None if there is no such
@@ -20,6 +26,7 @@ def shutil_which(cmd, mode=os.F_OK | os.X_OK, path=None):
     # Check that a given file can be accessed with the correct mode.
     # Additionally check that `file` is not a directory, as on Windows
     # directories pass the os.access check.
+    # noinspection PyShadowingNames
     def _access_check(fn, mode):
         return (os.path.exists(fn) and os.access(fn, mode)
                 and not os.path.isdir(fn))
@@ -40,7 +47,7 @@ def shutil_which(cmd, mode=os.F_OK | os.X_OK, path=None):
 
     if sys.platform == "win32":
         # The current directory takes precedence on Windows.
-        if not os.curdir in path:
+        if os.curdir not in path:
             path.insert(0, os.curdir)
 
         # PATHEXT is necessary to check on Windows.
@@ -61,7 +68,7 @@ def shutil_which(cmd, mode=os.F_OK | os.X_OK, path=None):
     seen = set()
     for dir in path:
         normdir = os.path.normcase(dir)
-        if not normdir in seen:
+        if normdir not in seen:
             seen.add(normdir)
             for thefile in files:
                 name = os.path.join(dir, thefile)
@@ -69,9 +76,11 @@ def shutil_which(cmd, mode=os.F_OK | os.X_OK, path=None):
                     return name
     return None
 
+
 def _isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
-    #https://www.python.org/dev/peps/pep-0485
+    # https://www.python.org/dev/peps/pep-0485
     return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
+
 
 # Monkey patch for pygraphviz.agraph.AGraph._which
 try:
@@ -86,5 +95,7 @@ except ImportError:
     isclose = _isclose
 
 # Monkey patch for read_* to not interpret 'NULL', 'N/A' & 'NA' as NaN
-# This is an ugly hack and really *should* be implemented by library users by passing by passing na_values=[], keep_default_na=False to their pandas.read_* calls
-pandas.io.parsers._NA_VALUES = {'-1.#QNAN', '-nan', '', '-NaN', '#NA', 'N/A', 'NaN', '#N/A', '1.#QNAN', '1.#IND', 'nan', '-1.#IND', '#N/A N/A'}
+# This is an ugly hack and really *should* be implemented by library users by passing by passing
+# `na_values=[], keep_default_na=False` to their pandas.read_* calls
+pandas.io.parsers._NA_VALUES = {
+    '-1.#QNAN', '-nan', '', '-NaN', '#NA', 'N/A', 'NaN', '#N/A', '1.#QNAN', '1.#IND', 'nan', '-1.#IND', '#N/A N/A'}

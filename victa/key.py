@@ -7,7 +7,7 @@ TODO:
     - Module level doc
 """
 
-__all__ = ['Key']
+__all__ = ['build_key', 'Key']
 
 import pandas as pd
 import networkx as nx
@@ -21,7 +21,7 @@ import networkx as nx
 # except ImportError:
 #     from networkx import graphviz_layout
 #
-## Monkey patch for pygraphviz.agraph.AGraph._which
+# # Monkey patch for pygraphviz.agraph.AGraph._which
 # from victa.utils import _which
 # pygraphviz.agraph.AGraph._which = _which
 
@@ -42,14 +42,15 @@ class Key(object):
              key_desc (str): see victa.key.build_key
              rules_df (pandas.DataFrame): see victa.key.build_rules
          """
-        # Make all column headers upper case, as sqlalchemy columns are returned lower, cx_oracle are upper and csv/excel
-        # could be any case
+        # Make all column headers upper case, as sqlalchemy columns are returned lower,
+        # cx_oracle are upper and csv/excel could be any case
         rules_df.columns = rules_df.columns.str.upper()
         key_df.columns = key_df.columns.str.upper()
 
         self.ruleset = build_rules(rules_df)
         self.key = build_key(key_df, key_desc)
 
+    # noinspection PyShadowingNames
     def classify(self, record, id_field=None):
         """
         Classify a record
@@ -58,7 +59,7 @@ class Key(object):
             record (pandas.Series): record to be classified
                 record needs to contain all columns (Series axis labels) referred to in the :code:`Rule`.
                 See victa.rules.build_rules
-            id_field (str): Name of attribute field to uniquely identify each record.
+            id_field (str): column name to use as unique ID field
 
         Returns:
             tuple(pandas.Series, pandas.Dataframe): the output class and a the couplets that were traversed
@@ -73,14 +74,14 @@ class Key(object):
 
         visited = [self.key.root]
 
-        # Make all column headers upper case, as sqlalchemy columns are returned lower, cx_oracle are upper and csv/excel
-        # could be any case
-        record.rename(lambda i: i.upper(), inplace=True) #record will be a pandas Series
+        # Make all column headers upper case, as sqlalchemy columns are returned lower,
+        # cx_oracle are upper and csv/excel could be any case
+        record.rename(lambda i: i.upper(), inplace=True)  # record will be a pandas Series
         if id_field:
             id_field = id_field.upper()
 
         # TODO figure out a better way to stop infinite recursion
-        #while True:
+        # while True:
         for i in range(len(self.key.node)*2):
 
             matches = []
@@ -95,10 +96,12 @@ class Key(object):
                 visited += [couplet]
 
                 if couplet.type == 'class':
-                    # TODO decide return data model: tuple(pandas.Series, pandas.Dataframe), tuple(Couplet, list), etc...?
+                    # TODO decide return data model:
+                    # tuple(pandas.Series, pandas.Dataframe), tuple(Couplet, list), etc...?
+
                     # return couplet, visited
-                    result = couplet.to_series()  # Series
-                    steps = pd.DataFrame(visited) # Dataframe
+                    result = couplet.to_series()   # Series
+                    steps = pd.DataFrame(visited)  # Dataframe
                     steps = steps.assign(step=steps.index)
 
                     if id_field:
@@ -123,6 +126,7 @@ class Key(object):
             records (pandas.DataFrame): records to be classified
                 records need to contain all columns (DataFrame axis labels) referred to in the :code:`Rule`s
                 see victa.key.build_rules
+            id_field (str): column name to use as unique ID field
 
         Yields:
             tuple(pandas.Series, pandas.Dataframe, pandas.Series): the output class, a list of couplets
@@ -192,7 +196,7 @@ def build_key(key_df, key_desc):
         key: nx.DiGraph
     """
     key = nx.DiGraph()
-    key.root = Couplet(0, 'root', key_desc)  ## Root couplet ID must always be 0
+    key.root = Couplet(0, 'root', key_desc)  # Root couplet ID must always be 0
     key.add_node(key.root.id, couplet=key.root)
 
     for idx, row in key_df.iterrows():
@@ -200,7 +204,7 @@ def build_key(key_df, key_desc):
             raise ManadatoryFieldError('"INPUT_COUPLET" must contain a value')
         if pd.isnull(row['RULES']):
             raise ManadatoryFieldError('"RULES" must contain a value')
-        if pd.isnull(row['OUTPUT_CLASS']) and pd.isnull(row['OUTPUT_COUPLET']) :
+        if pd.isnull(row['OUTPUT_CLASS']) and pd.isnull(row['OUTPUT_COUPLET']):
             raise ManadatoryFieldError('Either "OUTPUT_COUPLET" or "OUTPUT_CLASS" must contain a value')
         if pd.isnull(row['OUTPUT_NAME']):
             raise ManadatoryFieldError('"OUTPUT_NAME" must contain a value')

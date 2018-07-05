@@ -7,6 +7,8 @@ import pandas as pd
 class Couplet(namedtuple('Couplet', ['id', 'type', 'name', 'comments'])):
     """namedtuple: lightweight class for couplets"""
     __slots__ = ()
+
+    # noinspection PyShadowingBuiltins
     def __new__(cls, id, type, name, comments=''):
         """Make comments optional"""
         return super(Couplet, cls).__new__(cls,  id, type, name, comments)

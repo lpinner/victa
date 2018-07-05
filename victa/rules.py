@@ -1,7 +1,7 @@
 """
 TODO Docstring
 """
-__all__ = ['Rule', 'RuleSet']
+__all__ = ['build_rules', 'Rule', 'RuleSet']
 
 import ast
 import pandas as pd
@@ -11,6 +11,8 @@ import sre_constants
 from .errors import RuleSyntaxError, ManadatoryFieldError
 from .utils import isclose
 
+
+# noinspection PyCallingNonCallable
 class Rule(object):
     """
     Build a callable Rule object.
@@ -20,7 +22,8 @@ class Rule(object):
     Args:
         value (str): text string to look for
         attribute (str): attribute/column to use when rule is tested
-        operator (str): positive comparison operator: :code:`in`, :code:`=`, :code:`>=`, :code:`>`, :code:`<=`, :code:`<`, :code:`regex`
+        operator (str): positive comparison operator:
+            :code:`in`, :code:`=`, :code:`>=`, :code:`>`, :code:`<=`, :code:`<`, :code:`regex`
             where: regex is a valid regular expression string (https://docs.python.org/3/library/re.html)
         name (str): Rule name
         comment (str, optional): Additional comments
@@ -39,7 +42,7 @@ class Rule(object):
             '=': self._equal,
             '==': self._equal,
             'equals': self._equal,
-            'equal': self._equal, # Required for backwards compatibility
+            'equal': self._equal,  # Required for backwards compatibility
             'in': self._in,
             '>=': self._ge,
             'ge': self._ge,
@@ -62,7 +65,7 @@ class Rule(object):
             except sre_constants.error as e:
                 raise RuleSyntaxError('Invalid regex syntax "{}": {}'.format(e.pattern, ','.join(e.args)))
         else:
-            self.value = str(value).strip().upper() ## TODO think about/handle case. What about regexes?
+            self.value = str(value).strip().upper()  # TODO think about/handle case. What about regexes?
 
         self.name = str(name).strip()
         self.comment = str(comment).strip()
@@ -77,6 +80,7 @@ class Rule(object):
         return self.value in value
 
     def _re(self, value):
+        # noinspection PyUnresolvedReferences
         return True if self.value.search(value) else False
 
     def _ge(self, value):
@@ -117,6 +121,7 @@ class Rule(object):
         return self.operator(value)
 
 
+# noinspection PyTypeChecker
 class RuleSet(dict):
 
     def test(self, expr, record):
@@ -133,9 +138,10 @@ class RuleSet(dict):
         """
         return eval(self._parse(expr), {}, {'self': self, 'record': record})
 
+    # noinspection PyMethodMayBeStatic
     def _parse(self, expr):
         """
-        Magic happens here :)
+        Black magic happens here... :)
 
         What this does is turn a string expression like :code:`not (123 or 456)` into a compiled code object ready for
         evaluation, such as :code:`not (ruleset[123](record) or ruleset[456](record))`
@@ -150,11 +156,11 @@ class RuleSet(dict):
             code (object):
         """
         transformer = RuleSetTransformer()
-        expr = str(expr).strip() #str(expr) to handle pandas parsing '321' as int
-                                 #.strip() to handle '" blah" is not valid python syntax, unexpected indent'
+        expr = str(expr).strip()  # str(expr) to handle pandas parsing '321' as int
+                                  # .strip() to handle '" blah" is not valid python syntax, unexpected indent'
         try:
             ast_expr = ast.parse(expr, mode='eval')
-            ast_expr = transformer.visit(ast_expr) #this automagically invokes RuleSetTransformer.visit_Num
+            ast_expr = transformer.visit(ast_expr)  # this automagically invokes RuleSetTransformer.visit_Num
             ast.fix_missing_locations(ast_expr)
             return compile(ast_expr, '', 'eval')
         except SyntaxError as err:
@@ -163,6 +169,7 @@ class RuleSet(dict):
 
 class RuleSetTransformer(ast.NodeTransformer):
 
+    # noinspection PyMethodMayBeStatic
     def visit_Num(self, node):
         """
         This function gets called by the transformer for each distinct numeric node (i.e 123).
@@ -174,10 +181,10 @@ class RuleSetTransformer(ast.NodeTransformer):
         Returns:
             node (ast.node):
         """
-        ## TODO this is hard to debug, is there a better way?
+        # TODO this is hard to debug, is there a better way?
         value = ast.Name(id='self', ctx=ast.Load())
         slice = ast.Index(value=node)
-        func = ast.Subscript(value=value,slice=slice,ctx=ast.Load())
+        func = ast.Subscript(value=value, slice=slice, ctx=ast.Load())
 
         call = ast.Call(func=func,
                         args=[ast.Name(id='record', ctx=ast.Load())],
@@ -214,7 +221,7 @@ def build_rules(rules_df):
         test = row.loc[mandatory]
         if test.isnull().any():
             fields = ', '.join(['"{}"'.format(m) for m in mandatory])
-            values =  test.to_dict()
+            values = test.to_dict()
             raise ManadatoryFieldError('All of {} must contain a value: {}'.format(fields, values))
 
         rule_id = int(row['ID'])

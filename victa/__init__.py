@@ -21,8 +21,9 @@ __all__ = ['build_rules',
            'RuleSyntaxError',
            ]
 
-from .key import Key, ClassificationError, build_key
-from .rules import Rule, RuleSet, build_rules
 from .couplets import Couplet
-from .errors import RuleSyntaxError, ClassificationError, MultipleMatchesError
-from .utils import * # ensure patches are applied
+from .errors import (RuleSyntaxError, ClassificationError, MultipleMatchesError)
+from .key import (Key, build_key)
+from .rules import (Rule, RuleSet, build_rules)
+from .utils import *  # ensure patches are applied
+

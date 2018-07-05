@@ -10,7 +10,7 @@ class ClassificationError(VictaError, RuntimeError):
         self.steps = steps
 
         msg = 'Unable to classify record "{}={}". Visited couplets ("{}")'
-        msg = msg.format(id_field,record[id_field], '", "'.join((str(c.id) for c in steps)))
+        msg = msg.format(id_field, record[id_field], '", "'.join((str(c.id) for c in steps)))
         super(ClassificationError, self).__init__(msg)
 
 
@@ -23,7 +23,7 @@ class MultipleMatchesError(VictaError, RuntimeError):
         self.rulesets = rulesets
 
         msg = 'Record "{}={}" matches multiple rulesets for couplet "{}" ("{}")'
-        msg = msg.format(id_field,record[id_field], couplet.id, '", "'.join(rulesets))
+        msg = msg.format(id_field, record[id_field], couplet.id, '", "'.join(rulesets))
         super(MultipleMatchesError, self).__init__(msg)
 
 
