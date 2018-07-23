@@ -16,5 +16,5 @@ doc:
 	
 	cd docs && sphinx-apidoc -f -o "."  "../victa"
 	cd docs && sphinx-build -M html "." 
-	pandoc -o README.docx -f markdown -t docx README.md --reference-docx=src/docs/reference.docx
+	pandoc -o README.docx -f rst -t docx README.rst --reference-docx=docs/reference.docx
 

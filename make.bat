@@ -31,8 +31,8 @@ if "%1" == "doc" goto doc
 
     sphinx-apidoc  -f -o "."  "../victa"
     sphinx-build -M html . .
-    pandoc -o %~dp0README.docx -f markdown -t docx %~dp0README.md --reference-docx=reference.docx
-    goto end 
+    pandoc -o %~dp0README.docx -f rst -t docx %~dp0README.rst --reference-docx=reference.docx
+    goto end
 
 :end
 popd
