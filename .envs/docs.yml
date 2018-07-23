@@ -1,0 +1,9 @@
+name: victa-docs
+dependencies:
+- python>=3.6
+- networkx
+- pandas
+- xlrd
+- openpyxl
+
+
