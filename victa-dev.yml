@@ -1,0 +1,16 @@
+name: victa-dev
+dependencies:
+- python>=3.6
+- networkx
+- pandas
+- xlrd
+- openpyxl
+- pytest
+- sphinx
+- docutils
+- pytest
+- coverage
+- pandoc
+- sphinx_rtd_theme
+
+

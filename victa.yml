@@ -1,0 +1,11 @@
+name: victa
+dependencies:
+- python>=3.6
+- networkx
+- pandas
+- xlrd
+- openpyxl
+- pip:
+  - https://github.com/lpinner/victa.git#egg=victa
+
+
