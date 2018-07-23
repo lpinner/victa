@@ -44,7 +44,7 @@ The key dataframe must have the following column structure:
 | Attribute Name  | Description                                                                         |
 |-----------------|-------------------------------------------------------------------------------------|
 | INPUT_COUPLET   | Unique integer identifying the parent couplet.                                      |
-| RULES           | String containing expression** to test.                                               |
+| RULES           | String containing expression** to test.                                             |
 | OUTPUT_COUPLET  | Couplet to output if rules expression is True (mutally exclusive with OUTPUT_CLASS) |
 | OUTPUT_CLASS    | Class to output if rules expression is True (mutally exclusive with OUTPUT_COUPLET) |
 | OUTPUT_NAME     | Output couplet/class name                                                           |
@@ -70,24 +70,15 @@ The key dataframe must have the following column structure:
 ### Rules
 The rules dataframe must have the following column structure:
 
-+------------------+-------------------------------------------------+
-| Attribute Name   | Description                                     |                                                                       |
-+==================+=================================================+
-|    ID            | Unique integer identifying the rule             |
-+------------------+-------------------------------------------------+
-|    ATTRIBUTE     | Attribute/column to use when rule is tested\    |
-|                  | (i.e. in the record to be classified by the key)|
-+------------------+-------------------------------------------------+
-|    OPERATOR      | positive comparison operator:\                  |
-|                  | `in`, `=`, `>=`, `>`, `<=`, `<`, `regex`\       |
-|                  | (where: regex is a valid [regular expression](https://docs.python.org/3/library/re.html) )|
-+------------------+-------------------------------------------------+
-|    VALUE         | Text string to look   for in ATTRIBUTE          |
-+------------------+-------------------------------------------------+
-|    NAME          | Rule name                                       |
-+------------------+-------------------------------------------------+
-|    COMMENTS      | Additional comments [optional]                  |
-+------------------+-------------------------------------------------+
+| Attribute Name  | Description                          |
+|-----------------|--------------------------------------|
+| ID              | Unique integer identifying the rule. |
+| ATTRIBUTE       | Attribute/column to use when rule is tested (i.e. in the record to be classified by the key)|
+| OPERATOR        | Positive comparison operator: `in`, `=`, `>=`, `>`, `<=`, `<`, `regex`  (where: `regex` is a valid [regular expression](https://docs.python.org/3/library/re.html) )|
+| VALUE           | Text string to look for in ATTRIBUTE |
+| NAME            | Rule name                            |
+| COMMENTS        | Additional comments [optional]       |
+
 
 ## Code Example
 
@@ -155,7 +146,7 @@ if __name__ == '__main__':
 
 ## API Reference
 
-See apidoc/html/index.html
+https://victa.readthedocs.io/en/latest/
 
 ## Tests
 
